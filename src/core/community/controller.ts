@@ -14,14 +14,18 @@ const createCommunity = asyncHandler(async (req: Request, res: Response) => {
 
     const request = req.body as CreateCommunityRequest;
 
-    const community = await createNewCommunity(request, req.user!);
+    try {
+        const community = await createNewCommunity(request, req.user!);
 
-    res.status(201).json({
-        data: {
-            community
-        },
-        error: false
-    });
+        res.status(201).json({
+            data: {
+                community
+            },
+            error: false
+        });
+    } catch (err) {
+        res.status(400).json({ message: (err as Error).message });
+    }
 
 });
 

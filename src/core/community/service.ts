@@ -1,4 +1,4 @@
-import type { User } from "../user/index.js";
+import type { User } from "../user/types.js";
 import type { CreateCommunityRequest } from "./requests.js";
 import type { Community as CommunityT } from "./types.js";
 import { Community } from "./models.js";

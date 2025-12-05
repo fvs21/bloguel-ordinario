@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../user/models.js';
 import type { RegisterRequest } from './requests.js';
-import type { User as UserT } from '../user/index.js';
+import type { User as UserT } from '../user/types.js';
 
 const hashPassword = async (password: string): Promise<string> => {
     const salt = await bcrypt.genSalt(10);
