@@ -5,9 +5,8 @@ import type { Profile as PT } from "./types.js";
 const updateProfile = async (userId: string, data: UpdateProfileRequest): Promise<PT> => {
     const profile = await Profile.findOne({ userId });
 
-    if (!profile) {
+    if (!profile) 
         return Profile.create({ userId, ...data });
-    }
 
     profile.bio = data.bio;
 

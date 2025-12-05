@@ -1,10 +1,16 @@
 import asyncHandler from 'express-async-handler';
-import { createPost, votePost, commentOnPost } from './service.js';
+import { createPost, votePost, commentOnPost, getPost } from './service.js';
 import { validateCreatePostData } from './utils.js';
 
 const createPostController = asyncHandler(async (req, res) => {
     const user = req.user;
     const data = req.body;
+    const communityName = req.params.communityName;
+
+    if (!communityName) {
+        res.status(400).json({ message: "Community name is required" });
+        return;
+    }
 
     const error = validateCreatePostData(data);
 
@@ -14,10 +20,10 @@ const createPostController = asyncHandler(async (req, res) => {
     }
 
     try {
-        const post = await createPost(user, data);
+        const post = await createPost(user, communityName, data);
         res.status(201).json(post);
     } catch (error) {
-        res.status(400).json({ message: error });
+        res.status(400).json({ message: (error as Error).message });
     }
 });
 
@@ -58,8 +64,26 @@ const commentController = asyncHandler(async (req, res) => {
     }
 });
 
+const getPostController = asyncHandler(async (req, res) => {
+    const { postId } = req.params;
+
+    if (!postId) {
+        res.status(400).json({ message: "Post ID is required" });
+        return;
+    }
+
+    try {
+        const post = await getPost(postId);
+        res.status(200).json(post);
+    } catch (error) {
+        res.status(404).json({ message: (error as Error).message });
+    }
+
+});
+
 export {
     createPostController,
     votePostController,
-    commentController
+    commentController,
+    getPostController
 }

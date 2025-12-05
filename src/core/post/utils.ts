@@ -1,7 +1,4 @@
 const validateCreatePostData = (data: any): string | null => {
-    if (!data.communityId || typeof data.communityId !== 'string') {
-        return "Invalid or missing communityId";
-    }
     if (!data.title || typeof data.title !== 'string') {
         return "Invalid or missing title";
     }

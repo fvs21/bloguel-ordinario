@@ -8,19 +8,23 @@ import { Vote } from "./models.js"
 import { Comment } from "./models.js"
 import type { Comment as CT } from "./types.js"
 
-const createPost = async (user: UT, data: CreatePostRequest): Promise<PT> => {
-    const community = await Community.findById(data.communityId);
+const isUserSubscribedToCommunity = async (userId: string, communityId: string): Promise<boolean> => {
+    const subscription = await Subscription.findOne({
+        userId,
+        communityId
+    });
+
+    return !!subscription;
+}
+
+const createPost = async (user: UT, communityName: string, data: CreatePostRequest): Promise<PT> => {
+    const community = await Community.findOne({ name: communityName });
 
     if (!community) {
         throw new Error("Community not found");
     }
 
-    const isSubscribed = await Subscription.findOne({
-        userId: user._id,
-        communityId: community._id
-    });
-
-    if (!isSubscribed) {
+    if (!(await isUserSubscribedToCommunity(user._id.toString(), community._id.toString()))) {
         throw new Error("User is not subscribed to the community");
     }
 
@@ -39,6 +43,10 @@ const votePost = async (user: UT, postId: string, voteType: 'upvote' | 'downvote
 
     if (!post) {
         throw new Error("Post not found");
+    }
+
+    if (!(await isUserSubscribedToCommunity(user._id.toString(), post.community.toString()))) {
+        throw new Error("User is not subscribed to the community");
     }
 
     let vote = await Vote.findOne({
@@ -81,6 +89,10 @@ const commentOnPost = async (user: UT, postId: string, content: string): Promise
         throw new Error("Post not found");
     }
 
+    if (!(await isUserSubscribedToCommunity(user._id.toString(), post.community.toString()))) {
+        throw new Error("User is not subscribed to the community");
+    }
+
     const comment = await Comment.create({
         postId: post._id,
         userId: user._id,
@@ -90,8 +102,19 @@ const commentOnPost = async (user: UT, postId: string, content: string): Promise
     return comment;
 }
 
+const getPost = async (postId: string): Promise<PT> => {
+    const post = await Post.findById(postId).populate('createdBy', 'username').populate('community', 'name');
+
+    if (!post) {
+        throw new Error("Post not found");
+    }
+
+    return post;
+}
+
 export {
     createPost,
     votePost,
-    commentOnPost
+    commentOnPost,
+    getPost
 };

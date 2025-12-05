@@ -14,9 +14,10 @@ const updateProfileController = asyncHandler(async (req, res) => {
     }
 
     try {
-        const updatedProfile = await updateProfile(user.id, body);
+        const updatedProfile = await updateProfile(user._id, body);
         res.status(200).json(updatedProfile);
     } catch (err) {
+        console.log(err)
         res.status(500).json({ message: 'Internal server error' });
     }
 });
